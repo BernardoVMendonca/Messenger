@@ -1,9 +1,17 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, TextInput, Button, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  Button,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 
 export default function App() {
   const [inputText, setInputText] = useState("");
+  let [messages] = useState([]);
 
   const handleInputChange = (text) => {
     setInputText(text);
@@ -11,23 +19,35 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    console.log("Texto inserido:", inputText);
+    messages.push(inputText);
+    console.log("-----------------------");
+    messages.map((message, index) =>
+      console.log(messages.length + " " + message + " " + index)
+    );
   };
 
   return (
     <View style={styles.messageContainerOUT}>
-      <View
-        style={styles.messageContainerIN}
-      >
+      {/* Mensagens */}
+      <View style={styles.message}>
+        {messages.map((message, index) => (
+          <Text key={index}>{message}</Text>
+        ))}
+      </View>
+
+      {/* Enviar e escrever mensagem */}
+      <View style={styles.messageContainerIN}>
         <TextInput
           style={styles.textInput}
           placeholder="Digite aqui"
           onChangeText={handleInputChange}
           value={inputText}
         />
-        <TouchableOpacity style={styles.sendButton}
+        <TouchableOpacity
+          style={styles.sendButton}
           title="Enviar"
-          onPress={handleButtonPress}>
+          onPress={handleButtonPress}
+        >
           <Text>Enviar</Text>
         </TouchableOpacity>
       </View>
@@ -45,10 +65,14 @@ const styles = StyleSheet.create({
   },
 
   messageContainerIN: {
-    flexDirection:"row",
+    flexDirection: "row",
     marginBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
+  },
+
+  message: {
+    flex: 1,
   },
 
   textInput: {
@@ -56,21 +80,21 @@ const styles = StyleSheet.create({
     width: "75%",
     borderColor: "gray",
     backgroundColor: "white",
-    borderBottomLeftRadius:10,
-    borderTopLeftRadius:10,
+    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 10,
     borderWidth: 1,
     textAlign: "left",
-    paddingLeft: 10
+    paddingLeft: 10,
   },
 
   sendButton: {
     height: 40,
     width: "25%",
     backgroundColor: "darkolivegreen",
-    borderBottomRightRadius:10,
-    borderTopRightRadius:10,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
     borderWidth: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 });
