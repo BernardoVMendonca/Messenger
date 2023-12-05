@@ -15,9 +15,9 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.messageContainerOUT}>
       <View
-        style={{flexDirection:"row"}}
+        style={styles.messageContainerIN}
       >
         <TextInput
           style={styles.textInput}
@@ -36,33 +36,41 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  messageContainerOUT: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
     alignItems: "center",
-    backgroundColor: "azure",
+    backgroundColor: "beige",
+  },
+
+  messageContainerIN: {
+    flexDirection:"row",
+    marginBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
 
   textInput: {
     height: 40,
-    width: "65%",
+    width: "75%",
     borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
+    backgroundColor: "white",
     borderBottomLeftRadius:10,
     borderTopLeftRadius:10,
+    borderWidth: 1,
+    textAlign: "left",
+    paddingLeft: 10
   },
 
   sendButton: {
-    width: "25%",
     height: 40,
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
-    backgroundColor: "aqua",
+    width: "25%",
+    backgroundColor: "darkolivegreen",
     borderBottomRightRadius:10,
     borderTopRightRadius:10,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center"
   },
 });
