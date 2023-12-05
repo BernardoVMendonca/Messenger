@@ -6,12 +6,13 @@ import {
   Button,
   View,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 
 export default function App() {
   const [inputText, setInputText] = useState("");
-  let [messages] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const handleInputChange = (text) => {
     setInputText(text);
@@ -19,7 +20,7 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    messages.push(inputText);
+    setMessages([...messages,inputText])
     console.log("-----------------------");
     messages.map((message, index) =>
       console.log(messages.length + " " + message + " " + index)
@@ -27,36 +28,38 @@ export default function App() {
   };
 
   return (
-    <View style={styles.messageContainerOUT}>
+    <View style={styles.inputContainerOut}>
       {/* Mensagens */}
-      <View style={styles.message}>
+      <View style={styles.messageContainer}>
         {messages.map((message, index) => (
-          <Text key={index}>{message}</Text>
+          <Text key={index} style={styles.message}>
+            {message}
+          </Text>
         ))}
       </View>
 
       {/* Enviar e escrever mensagem */}
-      <View style={styles.messageContainerIN}>
+      <View style={styles.inputContainerIn}>
         <TextInput
           style={styles.textInput}
           placeholder="Digite aqui"
           onChangeText={handleInputChange}
           value={inputText}
         />
-        <TouchableOpacity
+        <Pressable
           style={styles.sendButton}
           title="Enviar"
           onPress={handleButtonPress}
         >
           <Text>Enviar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  messageContainerOUT: {
+  inputContainerOut: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
@@ -64,20 +67,28 @@ const styles = StyleSheet.create({
     backgroundColor: "beige",
   },
 
-  messageContainerIN: {
+  inputContainerIn: {
     flexDirection: "row",
+    width: "100%",
     marginBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
+    height: "5vh",
+  },
+
+  messageContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    width: "100%",
   },
 
   message: {
-    flex: 1,
+    textAlign: "center",
+
   },
 
   textInput: {
-    height: 40,
-    width: "75%",
+    width: "70%",
     borderColor: "gray",
     backgroundColor: "white",
     borderBottomLeftRadius: 10,
@@ -85,10 +96,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     textAlign: "left",
     paddingLeft: 10,
+    fontSize: "18px",
   },
 
   sendButton: {
-    height: 40,
     width: "25%",
     backgroundColor: "darkolivegreen",
     borderBottomRightRadius: 10,
@@ -96,5 +107,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
+    fontSize: "18px",
   },
 });
