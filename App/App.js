@@ -8,11 +8,24 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+
+import WebSocket from 'react-native-websocket';
+
+import React, { useState, useEffect } from "react";
 
 export default function App() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
+
+
+  useEffect((async () => {
+    let id = prompt('Please input your user name');
+    let res = await fetch(`http://localhost:8080/negotiate?id=${id}`);
+    let data = await res.json();
+    let ws = new WebSocket("ws://localhost:8080");
+    ws.onopen = () => console.log('connected');
+  }));
+
 
   const handleInputChange = (text) => {
     setInputText(text);
@@ -20,7 +33,7 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    setMessages([...messages,inputText])
+    setMessages([...messages, inputText])
     console.log("-----------------------");
     messages.map((message, index) =>
       console.log(messages.length + " " + message + " " + index)
