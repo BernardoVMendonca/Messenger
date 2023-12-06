@@ -1,11 +1,10 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
   TextInput,
-  Button,
   View,
-  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
@@ -20,26 +19,28 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    setMessages([...messages,inputText])
-    console.log("-----------------------");
-    messages.map((message, index) =>
-      console.log(messages.length + " " + message + " " + index)
-    );
+    setMessages([...messages, inputText]);
+    // console.log("-----------------------");
+    // messages.map((message, index) =>
+    //   console.log(messages.length + " " + message + " " + index)
+    // );
+
+    setInputText("");
   };
 
   return (
-    <View style={styles.inputContainerOut}>
+    <View style={styles.app}>
       {/* Mensagens */}
-      <View style={styles.messageContainer}>
+      <ScrollView style={styles.messageContainer}>
         {messages.map((message, index) => (
           <Text key={index} style={styles.message}>
             {message}
           </Text>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Enviar e escrever mensagem */}
-      <View style={styles.inputContainerIn}>
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
           placeholder="Digite aqui"
@@ -59,32 +60,43 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  inputContainerOut: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    alignItems: "center",
+  app: {
     backgroundColor: "beige",
-  },
-
-  inputContainerIn: {
-    flexDirection: "row",
     width: "100%",
-    marginBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
+  },
+
+  inputContainer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
     height: "5vh",
   },
 
   messageContainer: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    width: "100%",
+    flexDirection: "column-reverse",
+    height: "90vh",
+    width: "100vw",
+    marginBottom: "1vh",
   },
 
   message: {
-    textAlign: "center",
-
+    flex: 1,
+    flexWrap: 10,
+    width: "max-content",
+    maxWidth: "93vw",
+    fontSize: "18px",
+    borderWidth: 1,
+    paddingLeft: "1vw",
+    paddingRight: "1vw",
+    paddingBottom: "1vh",
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderTopLeftRadius: 10,
+    backgroundColor: "white",
+    borderColor: "gray",
   },
 
   textInput: {
@@ -100,7 +112,7 @@ const styles = StyleSheet.create({
   },
 
   sendButton: {
-    width: "25%",
+    width: "30%",
     backgroundColor: "darkolivegreen",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
