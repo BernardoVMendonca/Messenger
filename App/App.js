@@ -2,77 +2,78 @@ import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
-  TextInput,
-  Button,
   View,
-  TouchableOpacity,
+  ScrollView,
   Pressable,
+  TextInput,
 } from "react-native";
-
-import WebSocket from "react-native-websocket";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
+  const port = 44001;
+  const [ws, setWs] = useState();
+  const [id, steId] = useState("");
 
   useEffect(() => {
-    (async () => {
-      try {
-        let id = prompt("Please input your user name");
-        let res = await fetch(`http://localhost:19006/negotiate?id=${id}`);
-        let data = await res.json();
-        console.log(data);
-        let ws = new WebSocket(data.url);
-        // console.log(ws)ola
-        console.log("WebSocket created:", ws);
-        ws.onopen = function(e) {
-          alert("[open] Connection established");
-          alert("Sending to server");
-          socket.send("My name is John");
-        };
-        // ws.onerror = (error) => console.error("WebSocket Error:", error);
-        // ws.onmessage = (event) => console.log("WebSocket Message:", event.data);
+    let ws = new WebSocket(`ws://179.233.125.209:${port}`);
+    setWs(ws);
 
-        let event = document.querySelector("#sendButtom");
-        event.addEventListener("click", (e) => {
-          if (event.isComposing || event.keyCode === 229) return;
-          ws.send(messages.at(messages.length));
-          console.log("enviado");
-        });
-      } catch (error) {
-        console.log("Error during WebSocket setup:", error);
-      }
-    })();
+    ws.onopen = () => {
+      console.log("connected");
+    };
+
+    ws.addEventListener("message", (message) => {
+      console.log(`Recebido: ${message.data}`);
+      setMessages((messages) => [...messages, message.data]);
+    });
   }, []);
 
+  const handleIdChange = (id) => {
+    steId(id);
+  };
   const handleInputChange = (text) => {
     setInputText(text);
   };
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    setMessages([...messages, inputText]);
+    //setMessages([...messages, inputText]);
     console.log("-----------------------");
     messages.map((message, index) =>
       console.log(messages.length + " " + message + " " + index)
     );
+
+    // let message = {id: id, text: inputText};
+
+    ws.send(id + ":  " + inputText);
+    setInputText("");
   };
 
   return (
-    <View style={styles.inputContainerOut}>
+    <View style={styles.app}>
+        {/* Id */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.idInput}
+          placeholder="Id"
+          onChangeText={handleIdChange}
+          value={id}
+        />
+      </View>
+
       {/* Mensagens */}
-      <View style={styles.messageContainer}>
+      <ScrollView style={styles.messageContainer}>
         {messages.map((message, index) => (
           <Text key={index} style={styles.message}>
             {message}
           </Text>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Enviar e escrever mensagem */}
-      <View style={styles.inputContainerIn}>
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
           placeholder="Digite aqui"
@@ -80,7 +81,6 @@ export default function App() {
           value={inputText}
         />
         <Pressable
-          id="sendButtom"
           style={styles.sendButton}
           title="Enviar"
           onPress={handleButtonPress}
@@ -93,31 +93,44 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  inputContainerOut: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    alignItems: "center",
+  app: {
     backgroundColor: "beige",
-  },
-
-  inputContainerIn: {
-    flexDirection: "row",
     width: "100%",
-    marginBottom: 10,
     paddingLeft: 10,
     paddingRight: 10,
+  },
+
+  inputContainer: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
     height: "5vh",
+    paddingBottom: "1vh"
   },
 
   messageContainer: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    width: "100%",
+    flexDirection: "column-reverse",
+    height: "80vh",
+    width: "100vw",
+    marginBottom: "1vh",
   },
 
   message: {
-    textAlign: "center",
+    flex: 1,
+    flexWrap: 10,
+    width: "max-content",
+    maxWidth: "93vw",
+    fontSize: "18px",
+    borderWidth: 1,
+    paddingLeft: "1vw",
+    paddingRight: "1vw",
+    paddingBottom: "1vh",
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderTopLeftRadius: 10,
+    backgroundColor: "white",
+    borderColor: "gray",
   },
 
   textInput: {
@@ -133,7 +146,7 @@ const styles = StyleSheet.create({
   },
 
   sendButton: {
-    width: "25%",
+    width: "30%",
     backgroundColor: "darkolivegreen",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
@@ -141,5 +154,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     fontSize: "18px",
+  },
+
+  idInput: {
+    width: "100%",
+    borderColor: "gray",
+    backgroundColor: "white",
+    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    borderWidth: 1,
+    textAlign: "left",
+    paddingLeft: 10,
+    fontSize: "18px",
+    textAlign: "center"
   },
 });

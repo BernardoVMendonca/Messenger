@@ -1,40 +1,20 @@
-const express = require("express");
-const cors = require("cors");
-const { PubSub } = require("@google-cloud/pubsub");
+const {WebSocket, OPEN, Server} = require("ws");
 
-const app = express();
-const port = 19006;
+const wss = new Server({host: "10.64.64.4", port: 44001});
 
-const projectId = "mystical-timing-407306"; // Substitua pelo ID do seu projeto no Google Cloud
-const topicName = "messenger"; // Substitua pelo nome do seu tópico
+// WebSocket handling
+wss.on("connection", (ws) => {
+  //   console.log("Nova conexão WebSocket");
 
-const pubSubClient = new PubSub({ projectId });
+  // Evento de mensagem WebSocket
+  ws.on("message", (message) => {
+    console.log(`Recebido: ${message}`);
 
-app.use(cors());
-
-app.get("/negotiate", async (req, res) => {
-  let id = req.query.id;
-  //   console.log(`id/`, id);
-  if (!id) {
-    res.status(400).send("missing user id");
-    return;
-  }
-
-  const topic = pubSubClient.topic(topicName);
-  const data = JSON.stringify({ userId: id });
-  const messageId = await topic.publish(Buffer.from(data));
-  console.log('Message published:', messageId);
-
-
-  res.json({
-    url: `wss://127.0.0.1:19006/negotiable?messageId=${messageId}`,
+    wss.clients.forEach((client) => {
+      if (client.readyState === OPEN) {
+        client.send(message.toString());
+      }
+    });
+    // Enviar mensagem de volta para o cliente WebSocket
   });
-});
-
-app.use(express.static("public"));
-
-const server = app.listen(port, () => console.log("server started"));
-
-server.on("connection", (request, socket, head) => {
-  console.log("WebSocket connection established");
 });
