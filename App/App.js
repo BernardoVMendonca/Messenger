@@ -9,7 +9,7 @@ import {
   Pressable,
 } from "react-native";
 
-import WebSocket from 'react-native-websocket';
+import WebSocket from "react-native-websocket";
 
 import React, { useState, useEffect } from "react";
 
@@ -17,15 +17,35 @@ export default function App() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        let id = prompt("Please input your user name");
+        let res = await fetch(`http://localhost:19006/negotiate?id=${id}`);
+        let data = await res.json();
+        console.log(data);
+        let ws = new WebSocket(data.url);
+        // console.log(ws)ola
+        console.log("WebSocket created:", ws);
+        ws.onopen = function(e) {
+          alert("[open] Connection established");
+          alert("Sending to server");
+          socket.send("My name is John");
+        };
+        // ws.onerror = (error) => console.error("WebSocket Error:", error);
+        // ws.onmessage = (event) => console.log("WebSocket Message:", event.data);
 
-  useEffect((async () => {
-    let id = prompt('Please input your user name');
-    let res = await fetch(`http://localhost:8080/negotiate?id=${id}`);
-    let data = await res.json();
-    let ws = new WebSocket("ws://localhost:8080");
-    ws.onopen = () => console.log('connected');
-  }));
-
+        let event = document.querySelector("#sendButtom");
+        event.addEventListener("click", (e) => {
+          if (event.isComposing || event.keyCode === 229) return;
+          ws.send(messages.at(messages.length));
+          console.log("enviado");
+        });
+      } catch (error) {
+        console.log("Error during WebSocket setup:", error);
+      }
+    })();
+  }, []);
 
   const handleInputChange = (text) => {
     setInputText(text);
@@ -33,7 +53,7 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    setMessages([...messages, inputText])
+    setMessages([...messages, inputText]);
     console.log("-----------------------");
     messages.map((message, index) =>
       console.log(messages.length + " " + message + " " + index)
@@ -60,6 +80,7 @@ export default function App() {
           value={inputText}
         />
         <Pressable
+          id="sendButtom"
           style={styles.sendButton}
           title="Enviar"
           onPress={handleButtonPress}
@@ -97,7 +118,6 @@ const styles = StyleSheet.create({
 
   message: {
     textAlign: "center",
-
   },
 
   textInput: {
