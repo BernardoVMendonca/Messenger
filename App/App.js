@@ -9,22 +9,38 @@ import {
   Pressable,
 } from "react-native";
 
-import WebSocket from 'react-native-websocket';
+// import WebSocket from 'react-native-websocket';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 export default function App() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
+  const senderRef = useRef(null);
+  const inputRef = useRef(null);
 
-
-  useEffect((async () => {
+  useEffect(() => {
     let id = prompt('Please input your user name');
-    let res = await fetch(`http://localhost:8080/negotiate?id=${id}`);
-    let data = await res.json();
-    let ws = new WebSocket("ws://localhost:8080");
-    ws.onopen = () => console.log('connected');
-  }));
+    const loadData = async () => {
+      let res = await fetch(`http://localhost:8080/negotiate?id=${id}`);
+      let data = await res.json();
+      let ws = new WebSocket(data.url);
+      ws.onopen = () => {
+        console.log('connected');
+      }
+      console.log(senderRef.current);
+      senderRef.current.addEventListener('click', e => {
+        console.log("CLICKED");
+        console.log(inputRef.current.value);
+        if(inputRef.current.value)
+          ws.send(inputRef.current.value)
+        // if (e.charCode !== 13) return;
+        // ws.send(message.value);
+        // message.value = '';
+      });
+    }
+    loadData();
+  }, []);
 
 
   const handleInputChange = (text) => {
@@ -33,7 +49,7 @@ export default function App() {
 
   const handleButtonPress = () => {
     // Faça algo com o texto inserido
-    setMessages([...messages, inputText])
+    setMessages([...messages, inputText]);
     console.log("-----------------------");
     messages.map((message, index) =>
       console.log(messages.length + " " + message + " " + index)
@@ -58,11 +74,13 @@ export default function App() {
           placeholder="Digite aqui"
           onChangeText={handleInputChange}
           value={inputText}
+          ref={inputRef}
         />
         <Pressable
           style={styles.sendButton}
           title="Enviar"
           onPress={handleButtonPress}
+          ref={senderRef}
         >
           <Text>Enviar</Text>
         </Pressable>
