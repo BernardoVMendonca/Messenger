@@ -12,12 +12,13 @@ import React, { useState, useEffect, useRef } from "react";
 export default function App() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
-  const port = 44001;
+  const [connected, setConnected] = useState(false);
+  const port = 44007;
   const [ws, setWs] = useState();
-  const [id, steId] = useState("");
+  const [id, setId] = useState("");
 
   useEffect(() => {
-    let ws = new WebSocket(`ws://179.233.125.209:${port}`);
+    let ws = new WebSocket(`ws://127.0.0.1:${port}`);
     setWs(ws);
 
     ws.onopen = () => {
@@ -25,37 +26,56 @@ export default function App() {
     };
 
     ws.addEventListener("message", (message) => {
-      console.log(`Recebido: ${message.data}`);
-      setMessages((messages) => [...messages, message.data]);
+      const data = JSON.parse(message.data);      
+      
+      if (data.firstConnection && !connected) {
+        let m = []
+        data.messages.forEach(message => {
+          m.push(JSON.parse(message))
+        })
+        setMessages(m);
+        setConnected(true);
+      } else {
+        setMessages((messages) => [...messages, JSON.parse(message.data)]);
+      }
     });
   }, []);
 
   const handleIdChange = (id) => {
-    steId(id);
+    setId(id);
   };
   const handleInputChange = (text) => {
     setInputText(text);
   };
 
   const handleButtonPress = () => {
-    if (!inputText) return;
-    // Faça algo com o texto inserido
-    //setMessages([...messages, inputText]);
-    console.log("-----------------------");
-    messages.map((message, index) =>
-      console.log(messages.length + " " + message + " " + index)
-    );
-
-    // let message = {id: id, text: inputText};
-
+    if (!inputText || !id) return;
     ws.send(JSON.stringify({
       id: id,
       message: inputText,
       dateTime: new Date()
-    })
-    );
+    }));
     setInputText("");
   };
+
+
+  let textMessage = [];
+  let index = 0
+  for (const message of messages) {
+    let date = new Date(message.dateTime);
+    let dateText = date.getHours()+":"+date.getMinutes();
+    textMessage.push(
+      <View  key={index} style={styles.message}>
+        <Text>
+          {message.id+": "+message.message}
+        </Text>
+        <Text >
+          {dateText}
+        </Text>
+      </View>
+    )
+    index ++
+  }
 
   return (
     <View style={styles.app}>
@@ -63,7 +83,7 @@ export default function App() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.idInput}
-          placeholder="Id"
+          placeholder="Usuário"
           onChangeText={handleIdChange}
           value={id}
         />
@@ -71,13 +91,7 @@ export default function App() {
 
       {/* Mensagens */}
       <ScrollView style={styles.messageContainer}>
-        {messages.map((message, index) => (
-          <Text key={index} style={styles.message}>
-            {message.id}
-            {message.message}
-            {message.dateTime}
-          </Text>
-        ))}
+        {textMessage}
       </ScrollView>
 
       {/* Enviar e escrever mensagem */}
@@ -124,6 +138,9 @@ const styles = StyleSheet.create({
   },
 
   message: {
+    display:"flex",
+    flexDirection: "column",
+    padding: "4px",
     flex: 1,
     flexWrap: 10,
     width: "max-content",

@@ -1,20 +1,29 @@
-const {WebSocket, OPEN, Server} = require("ws");
+const { WebSocket, OPEN, Server } = require("ws");
 
-const wss = new Server({host: "10.64.64.4", port: 44001});
+const wss = new Server({ host: "127.0.0.1", port: 44007 });
 
 // WebSocket handling
+let messages = [];
 wss.on("connection", (ws) => {
-  //   console.log("Nova conexão WebSocket");
-    let messages = [];
-  // Evento de mensagem WebSocket
-  ws.on("message", (package) => {
-    console.log(`Recebido: ${package}`);
+    ws.send(JSON.stringify(
+        {
+            firstConnection: true, messages: messages
+        }
+    ))
+    console.log("Nova conexão WebSocket");
+    // Evento de mensagem WebSocket
+    console.log("messages: ",messages.length);
 
-    wss.clients.forEach((client) => {
-      if (client.readyState === OPEN) {
-        client.send(package);
-      }
+
+    ws.on("message", (package) => {
+        console.log(`(server) Recebido: ${package}`);
+        
+        messages.push(package.toString());
+        wss.clients.forEach((client) => {
+            if (client.readyState === OPEN) {
+                client.send(package.toString());
+            }
+        });
+        // Enviar mensagem de volta para o cliente WebSocket
     });
-    // Enviar mensagem de volta para o cliente WebSocket
-  });
 });
