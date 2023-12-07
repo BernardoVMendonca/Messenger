@@ -48,11 +48,11 @@ export default function App() {
 
     // let message = {id: id, text: inputText};
 
-    ws.send({
+    ws.send(JSON.stringify({
       id: id,
       message: inputText,
       dateTime: new Date()
-    }
+    })
     );
     setInputText("");
   };

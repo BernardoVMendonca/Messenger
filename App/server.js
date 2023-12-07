@@ -8,6 +8,7 @@ wss.on("connection", (ws) => {
     let messages = [];
   // Evento de mensagem WebSocket
   ws.on("message", (package) => {
+    package = JSON.parse(package);
     const {id, message, dateTime} = package
     console.log(`Recebido: ${message}`);
 
