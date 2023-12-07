@@ -25,8 +25,8 @@ export default function App() {
     };
 
     ws.addEventListener("message", (message) => {
-      console.log(`Recebido: ${message.data}`);
-      setMessages((messages) => [...messages, message.data]);
+      console.log(message);
+      setMessages((messages) => [...messages, JSON.parse(message.data)]);
     });
   }, []);
 
