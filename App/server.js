@@ -1,6 +1,6 @@
 const { WebSocket, OPEN, Server } = require("ws");
 
-const wss = new Server({ host: "179.233.125.209", port: 44001 });
+const wss = new Server({ host: "10.64.64.4", port: 44001 });
 
 // WebSocket handling
 let messages = [];
