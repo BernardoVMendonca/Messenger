@@ -36,7 +36,7 @@ export default function App() {
         setMessages(m);
         setConnected(true);
       } else {
-        setMessages((messages) => [...messages, JSON.parse(message.data)]);
+        setMessages((messages) => [...messages, {...JSON.parse(message.data),dateTime: Date()}]);
       }
     });
   }, []);
