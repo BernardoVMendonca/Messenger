@@ -38,6 +38,7 @@ export default function App() {
   };
 
   const handleButtonPress = () => {
+    if (!inputText) return;
     // Faça algo com o texto inserido
     //setMessages([...messages, inputText]);
     console.log("-----------------------");
@@ -47,13 +48,18 @@ export default function App() {
 
     // let message = {id: id, text: inputText};
 
-    ws.send(id + ":  " + inputText);
+    ws.send({
+      id: id,
+      message: inputText,
+      dateTime: new Date()
+    }
+    );
     setInputText("");
   };
 
   return (
     <View style={styles.app}>
-        {/* Id */}
+      {/* Id */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.idInput}
@@ -67,7 +73,9 @@ export default function App() {
       <ScrollView style={styles.messageContainer}>
         {messages.map((message, index) => (
           <Text key={index} style={styles.message}>
-            {message}
+            {message.id}
+            {message.message}
+            {message.dateTime}
           </Text>
         ))}
       </ScrollView>
